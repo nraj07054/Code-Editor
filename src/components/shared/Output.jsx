@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button, Text, Textarea } from "@chakra-ui/react";
 import { toaster } from "../ui/toaster";
 import { executeCode } from "../../api";
 import { useState } from "react";
@@ -8,6 +8,7 @@ const Output = ({ editorRef, language }) => {
   const [output, setOutput] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [input, setInput] = useState("");
 
   const runCode = async () => {
     const sourceCode = editorRef.current.getValue();
@@ -15,7 +16,7 @@ const Output = ({ editorRef, language }) => {
 
     try {
       setIsLoading(true);
-      const { run: result } = await executeCode(language, sourceCode);
+      const { run: result } = await executeCode(language, sourceCode, input);
       setOutput(result.output.split("\n"));
       result.stderr ? setIsError(true) : setIsError(false);
     } catch (error) {
@@ -46,7 +47,7 @@ const Output = ({ editorRef, language }) => {
         Run
       </Button>
       <Box
-        height="75vh"
+        height="58vh"
         p={2}
         color={isError ? "red.500" : ""}
         border="1px solid"
@@ -57,6 +58,14 @@ const Output = ({ editorRef, language }) => {
           ? output.map((line, i) => <Text key={i}>{line}</Text>)
           : `Click "Run" to see the output here`}
       </Box>
+      <Textarea
+        placeholder="Enter input for your code here..."
+        mt={3}
+        height="16vh"
+        resize="none"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
     </Box>
   );
 };
